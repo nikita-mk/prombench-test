@@ -12,7 +12,7 @@ ifdef PULL_PULL_SHA
 GITHUB_SHA = $(PULL_PULL_SHA)
 endif
 
-export GOOGLE_APPLICATION_CREDENTIALS=$(AUTH_FILE)
+export GOOGLE_APPLICATION_CREDENTIALS=/github/home/auth.yaml
 
 .PHONY: deploy clean
 deploy: nodepool_create resource_apply
