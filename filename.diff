@@ -1,0 +1,125 @@
+diff --git a/Makefile b/Makefile
+index 9a6c528..bd6ef59 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,4 +1,4 @@
+-DOCKER_REPO             ?= prombench
++DOCKER_REPO             ?= prombenchgeekodour
+ 
+ include Makefile.common
+ 
+diff --git a/manifests/cluster-infra/3b_prometheus-meta.yaml b/manifests/cluster-infra/3b_prometheus-meta.yaml
+index d546288..19f488c 100644
+--- a/manifests/cluster-infra/3b_prometheus-meta.yaml
++++ b/manifests/cluster-infra/3b_prometheus-meta.yaml
+@@ -7,7 +7,7 @@ spec:
+     - ReadWriteOnce
+   resources:
+     requests:
+-      storage: 1000Gi  # If you change this make sure to update the prometheus meta disk retention settings.
++      storage: 10Gi  # If you change this make sure to update the prometheus meta disk retention settings.
+ ---
+ apiVersion: v1
+ kind: ConfigMap
+diff --git a/manifests/prombench/benchmark/6_loadgen.yaml b/manifests/prombench/benchmark/6_loadgen.yaml
+index 4ef2223..997722c 100644
+--- a/manifests/prombench/benchmark/6_loadgen.yaml
++++ b/manifests/prombench/benchmark/6_loadgen.yaml
+@@ -55,7 +55,7 @@ metadata:
+   name: prometheus-loadgen-scaler
+   namespace: prombench-{{ .PR_NUMBER }}
+ spec:
+-  replicas: 1
++  replicas: 0
+   selector:
+     matchLabels:
+       app: loadgen-scaler
+@@ -96,7 +96,7 @@ metadata:
+   name: prometheus-loadgen-querier
+   namespace: prombench-{{ .PR_NUMBER }}
+ spec:
+-  replicas: 1
++  replicas: 0
+   selector:
+     matchLabels:
+       app: loadgen-querier
+@@ -142,4 +142,4 @@ spec:
+     port: 80
+     targetPort: loadgen-port
+   selector:
+-    app: loadgen-querier
+\ No newline at end of file
++    app: loadgen-querier
+diff --git a/manifests/prombench/nodepools.yaml b/manifests/prombench/nodepools.yaml
+index 0eb6d8b..3551a78 100644
+--- a/manifests/prombench/nodepools.yaml
++++ b/manifests/prombench/nodepools.yaml
+@@ -7,18 +7,18 @@ cluster:
+   - name: prometheus-{{ .PR_NUMBER }}
+     initialnodecount: 2
+     config:
+-      machinetype: n1-highmem-16
++      machinetype: n1-standard-1
+       imagetype: COS
+-      disksizegb: 100
++      disksizegb: 10
+       localssdcount: 1  #SSD is used to give fast-lookup to Prometheus servers being benchmarked
+       labels:
+         isolation: prometheus
+   - name: nodes-{{ .PR_NUMBER }}
+     initialnodecount: 1
+     config:
+-      machinetype: n1-highcpu-32
++      machinetype: n1-standard-1
+       imagetype: COS
+-      disksizegb: 100
++      disksizegb: 10
+       localssdcount: 0  #use standard HDD. SSD not needed for fake-webservers.
+       labels:
+-        isolation: none
+\ No newline at end of file
++        isolation: none
+diff --git a/manifests/prombench/prombenchTest_ss.yaml b/manifests/prombench/prombenchTest_ss.yaml
+index b1a6d7e..79bb035 100644
+--- a/manifests/prombench/prombenchTest_ss.yaml
++++ b/manifests/prombench/prombenchTest_ss.yaml
+@@ -17,7 +17,7 @@ spec:
+     spec:
+       initContainers:
+       - name: check-no-nodepool-exist
+-        image: docker.io/prombench/prombench:2.0.1
++        image: docker.io/prombenchgeekodour/prombench:sstest
+         imagePullPolicy: Always
+         command:
+         - "/bin/sh"
+@@ -40,7 +40,7 @@ spec:
+             value: "{{ .PR_NUMBER }}"
+       containers:
+       - name: prombench-test-{{ .PR_NUMBER }}
+-        image: docker.io/prombench/prombench:2.0.1
++        image: docker.io/prombenchgeekodour/prombench:sstest
+         imagePullPolicy: Always
+         command:
+         - "/bin/sh"
+diff --git a/manifests/prow/components/prow_internals_2.yaml b/manifests/prow/components/prow_internals_2.yaml
+index 46c5901..ca022be 100644
+--- a/manifests/prow/components/prow_internals_2.yaml
++++ b/manifests/prow/components/prow_internals_2.yaml
+@@ -217,7 +217,7 @@ data:
+         agent: kubernetes
+         spec:
+           containers:
+-          - image: docker.io/prombench/prombench:2.0.1
++          - image: docker.io/prombenchgeekodour/prombench:sstest
+             imagePullPolicy: Always
+             command:
+             - "make"
+@@ -249,7 +249,7 @@ data:
+         agent: kubernetes
+         spec:
+           containers:
+-          - image: docker.io/prombench/prombench:2.0.1
++          - image: docker.io/prombenchgeekodour/prombench:sstest
+             imagePullPolicy: Always
+             command:
+             - "make"

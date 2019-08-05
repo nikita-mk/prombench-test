@@ -1,0 +1,17 @@
+NOTE: just pushing a new commit to the pr will not automatically trigger a updated test
+
+- NO CHANGE in last_commit
+  - `/benchmark` -> complete -> `/benchmark cancel` [OK]
+  - `/benchmark` -> complete -> `/benchmark cancel` -> ongoing -> `/benchmark`
+    - the ss will be updated and the final state will be that of `/benchmark cancel` [OK]
+    - i.e the second `/benchmark` is irrelevant
+  - `/benchmark` -> incomplete -> `/benchmark cancel` [??]
+  - `/benchmark` -> complete -> `/benchmark` [NO CHANGE, OK]
+
+- CHANGE in last_commit
+  - `/benchmark` -> complete -> change commit -> `/benchmark`
+    - shutdown first test, start new test, i.e restart [OK]
+  - `/benchmark` -> complete -> `/benchmark cancel` -> ongoing -> change commit -> `/benchmark` [??]
+  - `/benchmark` -> complete -> change commit -> `/benchmark cancel` [OK]
+
+
